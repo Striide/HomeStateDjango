@@ -1,0 +1,29 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+
+script = <<SCRIPT
+sudo apt-get update
+sudo apt-get -y install python-pip
+sudo pip install django
+sudo pip install -r requirements.txt
+
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.0.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+
+sudo pip install mongoengine
+SCRIPT
+
+Vagrant.configure(2) do |config|
+
+  config.vm.box = "ubuntu/trusty32"
+  config.vm.box_url = "https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-i386-vagrant-disk1.box"
+
+  config.vm.network "forwarded_port", guest: 8000, host: 8888
+  config.vm.synced_folder "../", "/workspace"
+
+  config.vm.provision "shell", inline: script
+
+end
